@@ -3,13 +3,14 @@ failed_node=$1
 new_master=$2
 trigger_file=$4
 old_primary=$3
-# if standby goes down.
-if [ $failed_node != $old_primary ]; then
-    echo "[INFO] Slave node is down. Failover not triggred !";
+(
+  date
+  if [ $failed_node != $old_primary ]; then
+    echo "[INFO] Slave node ($failed_node) is down. Failover not triggered !";
     exit 0;
-fi
-# Create the trigger file if primary node goes down.
-echo "[INFO] Master node is down. Performing failover..."
-ssh -i /var/lib/postgresql/.ssh/id_rsa postgres@$new_master "touch $trigger_file"
-
-exit 0;
+  fi
+  echo "Failed node: $failed_node , New Master: $new_master"
+  set -x
+  /usr/bin/ssh -i /var/lib/postgresql/.ssh/id_rsa postgres@$new_master "touch $trigger_file"
+  exit 0;
+) 2>&1 | tee -a /etc/pgpool-II/logs/pgpool_failover.log
