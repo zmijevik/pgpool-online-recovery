@@ -9,7 +9,7 @@ archivedirdest=/var/lib/pgsql/archive
 #Usage
 if [ "$1" = "" ] || [ "$1" = "-h" ] || [ "$1" = "-help" ] || [ "$1" = "--help" ];
 then
-	echo "Usage: $0 masters ip address"
+        echo "Usage: $0 masters ip address"
 exit 0
 fi
 #This script must be run as postgres user
@@ -17,27 +17,27 @@ Whoami () {
     if [[ $(whoami) != "postgres" ]]
     then
         echo "[INFO] This script must be run as postgres user !"
-	exit 1
+        exit 1
     fi
 }
 
 #Check if postgres server is running on remote host
 CheckIfPostgresIsRunningOnRemoteHost () {
-	isrunning="$(ssh postgres@"$1" 'if killall -0 postgres; then echo "postgres_running"; else echo "postgress_not_running"; fi;')"
+        isrunning="$(ssh postgres@"$1" 'if killall -0 postgres; then echo "postgres_running"; else echo "postgress_not_running"; fi;')"
 
-	if [[ "$isrunning" = "postgress_not_running" ]]
-	then
-		echo "[ERROR] Postgres not running on the master. Exiting..";
+        if [[ "$isrunning" = "postgress_not_running" ]]
+        then
+                echo "[ERROR] Postgres not running on the master. Exiting..";
         exit 1
 
-	elif [[ "$isrunning" = "postgres_running" ]]
-	then
-		echo "[OK] Postgres master running on remote host";
+        elif [[ "$isrunning" = "postgres_running" ]]
+        then
+                echo "[OK] Postgres master running on remote host";
 
-	elif echo "[ERROR] Unexpected response. Exiting.."
-	then
-		exit 1
-	fi
+        elif echo "[ERROR] Unexpected response. Exiting.."
+        then
+                exit 1
+        fi
 }
 
 #Check if the supposed master is actually a master
@@ -70,7 +70,7 @@ PrepareLocalServer () {
     if [[ -f "$datadir/recovery.done" ]];
     then
             mv "$datadir"/recovery.done "$datadir"/recovery.conf
-    fi 
+    fi
 
     #Remove old WAL logs
     rm /var/lib/pgsql/archive/*
@@ -104,8 +104,8 @@ RsyncWhileLive () {
     then
         echo "[OK] Transfer completed.";
     else
-	echo "[ERROR] Error during transfer !";
-	exit 0;
+        echo "[ERROR] Error during transfer !";
+        exit 0;
     fi
 }
 
@@ -128,7 +128,7 @@ StopBackupModeAndArchiveIntoWallLog () {
 #stop postgres and copy transactions made during the last two rsync's
 StopPostgreSqlAndFinishRsync () {
     echo "[INFO] Stopping master node.."
-    ssh -t postgres@"$1" "sudo systemctl stop postgresql"
+    ssh -t -t postgres@"$1" "sudo systemctl stop postgresql"
     echo "[INFO] Transfering xlog files from master... "
     rsync -av --delete --progress -e ssh "$sourcehost":"$datadir"/pg_xlog/ "$datadir"/pg_xlog/ > /dev/null
     if [ $? == 0 ]
@@ -148,8 +148,8 @@ StartLocalAndThenRemotePostGreSql () {
 
 
     echo "[INFO] Starting master node.."
-    ssh -t postgres@"$1" "sudo systemctl start postgresql"
-    
+    ssh -t -t postgres@"$1" "sudo systemctl start postgresql"
+
     status=$(ssh  postgres@$1 "if ! killall -0 postgres; then echo 'error'; else echo 'running'; fi;")
     if [ $status == "error" ]
     then
