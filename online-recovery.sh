@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Postgres data directory
-postgres_datadir='/var/lib/psql/data'
+postgres_datadir='/var/lib/pgsql/data'
 #Postgres configuration directory
 postgres_configdir=$postgres_datadir
 #Postgres user ssh key
