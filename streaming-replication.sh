@@ -2,9 +2,9 @@
 
 ##This is meanst to be run on the slave, with the masters ip as the passed variable. ($1)
 sourcehost="$1"
-datadir=/var/lib/postgresql/9.1/main
-archivedir=/var/lib/postgresql/9.1/archive
-archivedirdest=/var/lib/postgresql/9.1/archive
+datadir=/var/lib/pgsql/data
+archivedir=/var/lib/pgsql/archive
+archivedirdest=/var/lib/pgsql/archive
 
 #Usage
 if [ "$1" = "" ] || [ "$1" = "-h" ] || [ "$1" = "-help" ] || [ "$1" = "--help" ];
@@ -42,7 +42,7 @@ CheckIfPostgresIsRunningOnRemoteHost () {
 
 #Check if the supposed master is actually a master
 CheckIfMasterIsActuallyAMaster () {
-    ismaster="$(ssh postgres@"$1" 'if [ -f /var/lib/postgresql/9.1/main/recovery.done ]; then echo "postgres_is_a_master_instance"; else echo "postgres_is_not_master"; fi;')"
+    ismaster="$(ssh postgres@"$1" 'if [ -f /var/lib/pgsql/data/recovery.done ]; then echo "postgres_is_a_master_instance"; else echo "postgres_is_not_master"; fi;')"
 
     if [[ "$ismaster" = "postgres_is_not_master" ]]
     then
@@ -73,7 +73,7 @@ PrepareLocalServer () {
     fi 
 
     #Remove old WAL logs
-    rm /var/lib/postgresql/9.1/archive/*
+    rm /var/lib/pgsql/archive/*
 }
 
 
@@ -89,10 +89,10 @@ CheckForRecoveryConfig () {
 
 
 #Put master into backup mode
-#Before doing PutMasterIntoBackupMode clean up archive logs (IE rm or mv /var/lib/postgresql/9.1/archive/*). They are not needed since we are effectivly createing a new base backup and then synching it.
+#Before doing PutMasterIntoBackupMode clean up archive logs (IE rm or mv /var/lib/pgsql/archive/*). They are not needed since we are effectivly createing a new base backup and then synching it.
 PutMasterIntoBackupMode () {
     echo "[INFO] Putting postgres master '$1' in backup mode."
-    ssh postgres@"$1" "rm /var/lib/postgresql/9.1/archive/*"
+    ssh postgres@"$1" "rm /var/lib/pgsql/archive/*"
     ssh postgres@"$1" "psql -c \"SELECT pg_start_backup('Streaming Replication', true)\" postgres"
 }
 
