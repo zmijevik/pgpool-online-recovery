@@ -2,14 +2,16 @@ pgpool-online-recovery
 ======================
 
 This simple project aims to automate and make easy the online recovery process of a failed pgpool's backend node in master/slave mode.
+This  projecthas been modified from its origin to cater to the CentOS 7 environment with a few additional helper shell scripts
 
 Requirements
 ============
 
 There are two requirements to these scripts to work.
 
-* The first one is [pgpool2](http://www.pgpool.net) (v3.1.3) available in [Debian Wheezy](http://packages.debian.org/stable/database/pgpool2). We assume that pgpool2 is installed, set up in master/slave mode with loadbalacing and manageable via PCP interface.
-* The second one is obviously Postgres server (v9.1) also available in Wheezy packages repository.
+pgpool-II
+postgresql9.2
+
 
 There are several tutorials about setting up pgpool2 and postgres servers with [Streaming Replication](http://wiki.postgresql.org/wiki/Streaming_Replication) and this readme is far to be a howto for configuring both of them. You can check out [this tutorial](https://aricgardner.com/databases/postgresql/pgpool-ii-3-0-5-with-streaming-replication/) which describes really all the steps needed.
 
@@ -27,6 +29,8 @@ What about the given scripts and config files ?
 
 **failover.sh** : This script will be executed automatically when a pgpool's backend node (postgres node) fails down. It'll switch the standby node (slave) to master (new master).
 
+**failback.sh** : This script should be manually executed on the master server to restore the original master.
+
 **online-recovery.sh** : This is the bash script which you'll execute manually in order to :
 * Reboot, sync and reattach slave node to pgpool if it fails.
 * Setup new master and new slave, sync and reattach them to pgpool if current master fails.
@@ -34,6 +38,8 @@ This script will invoque remotely the script streaming-replication.sh (in the ne
 PS : When a node (master or slave) fails, pgpool still running and DBs remain available. Otherwise, pgpool will detach this node for data consistancy reasons.
 
 **streaming-replication.sh** : This script can be executed manually to synchronize a slave node with a given master node (master name/ip must be passed as argument to streaming-replication.sh). Otherwise, this same script is triggred be online-recovery.sh via ssh during failback process.
+
+**restart-streaming-replication.sh** : A quickie to restart the streaming replication between the master and slave node
 
 Installation
 ------------
