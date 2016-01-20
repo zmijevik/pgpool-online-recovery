@@ -11,6 +11,6 @@ old_primary=$3
   fi
   echo "Failed node: $failed_node , New Master: $new_master"
   set -x
-  /usr/bin/ssh -i /var/lib/postgresql/.ssh/id_rsa postgres@$new_master "touch $trigger_file"
+  /usr/bin/ssh -i /var/lib/pgsql/.ssh/id_rsa postgres@$new_master "touch $trigger_file"
   exit 0;
 ) 2>&1 | tee -a /etc/pgpool-II/logs/pgpool_failover.log

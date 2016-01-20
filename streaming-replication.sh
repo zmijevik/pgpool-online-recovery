@@ -60,12 +60,12 @@ CheckIfMasterIsActuallyAMaster () {
 #prepare local server to become the new slave server.
 PrepareLocalServer () {
 
-    if [ -f '/tmp/trigger_file' ]
+    if [ -f '/tmp/postgresql.trigger.failover' ]
     then
-            rm /tmp/trigger_file
+            rm /tmp/postgresql.trigger.failover
     fi
     echo "[INFO] Stopping slave node.."
-    bash /etc/init.d/postgresql stop
+    sudo systemctl stop postgresql
 
     if [[ -f "$datadir/recovery.done" ]];
     then
@@ -128,7 +128,7 @@ StopBackupModeAndArchiveIntoWallLog () {
 #stop postgres and copy transactions made during the last two rsync's
 StopPostgreSqlAndFinishRsync () {
     echo "[INFO] Stopping master node.."
-    ssh postgres@"$1" "/etc/init.d/postgresql stop"
+    ssh -t postgres@"$1" "sudo systemctl stop postgresql"
     echo "[INFO] Transfering xlog files from master... "
     rsync -av --delete --progress -e ssh "$sourcehost":"$datadir"/pg_xlog/ "$datadir"/pg_xlog/ > /dev/null
     if [ $? == 0 ]
@@ -143,12 +143,12 @@ StopPostgreSqlAndFinishRsync () {
 #Start both Master and Slave
 StartLocalAndThenRemotePostGreSql () {
     echo "[INFO] Starting slave node.."
-    /etc/init.d/postgresql start
+    sudo systemctl start postgresql
     if ! killall -0 postgres; then echo '[ERROR] Slave not running !'; else echo "[OK] Slave started."; fi;
 
 
     echo "[INFO] Starting master node.."
-    ssh postgres@"$1" "/etc/init.d/postgresql start"
+    ssh -t postgres@"$1" "sudo systemctl start postgresql"
     
     status=$(ssh  postgres@$1 "if ! killall -0 postgres; then echo 'error'; else echo 'running'; fi;")
     if [ $status == "error" ]
