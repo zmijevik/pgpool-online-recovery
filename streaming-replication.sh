@@ -102,7 +102,7 @@ RsyncWhileLive () {
     rsync -C -av --delete --progress -e ssh --exclude server.key --exclude server.crt --exclude recovery.conf --exclude recovery.done --exclude postmaster.pid --exclude pg_xlog/ "$1":"$datadir"/ "$datadir"/ > /dev/null
     if [ $? == 0 ]
     then
-        echo "[OK] Transfert completed.";
+        echo "[OK] Transfer completed.";
     else
 	echo "[ERROR] Error during transfer !";
 	exit 0;
