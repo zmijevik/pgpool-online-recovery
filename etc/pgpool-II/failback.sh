@@ -9,7 +9,7 @@ postgres_user_key='/var/lib/pgsql/.ssh/id_rsa'
 #Pgpool configuration directory
 pgpool_configdir='/etc/pgpool-II'
 pgpool_username='pgpool'
-pgpool_password='somepassword'
+pgpool_password=$PGPOOL_PASSWD
 current_master_id=1
 #Get postgres master name
 current_master_name=$(pcp_node_info 10 localhost 9898 $pgpool_username $pgpool_password $current_master_id | cut -d' ' -f1)

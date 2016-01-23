@@ -9,7 +9,7 @@ postgres_user_key='/var/lib/pgsql/.ssh/id_rsa'
 #Pgpool configuration directory
 pgpool_configdir='/etc/pgpool-II'
 pgpool_username='pgpool'
-pgpool_password=$1
+pgpool_password=$PGPOOL_PASSWD
 
 if [ -f '/tmp/postgres_master' ]
 then
