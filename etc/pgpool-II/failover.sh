@@ -14,3 +14,5 @@ old_primary=$3
   /usr/bin/ssh -i /var/lib/pgsql/.ssh/id_rsa postgres@$new_master "touch $trigger_file"
   exit 0;
 ) 2>&1 | tee -a /etc/pgpool-II/logs/pgpool_failover.log
+
+/usr/local/bin/mandrill $SYSADMIN_EMAIL "PostgreSQL Failover Alert:`hostname`" "`hostname`: Failed node: $failed_node , New Master: $new_master, Make sure failover happened properly."
