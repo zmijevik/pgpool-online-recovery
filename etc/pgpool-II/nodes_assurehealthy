@@ -8,8 +8,10 @@ if [ $HAS_FLOATING_IP = "true" ]; then
     node_name=$( echo $node_info | awk '{print $1}')
     node_status=$( echo $node_info | awk '{print $3}')
     if [[ $node_status != '2'  ]]; then
-      /usr/local/bin/mandrill $SYSADMIN_EMAIL "PgPool Node Status Alert:`hostname`" "`hostname`: Failed node: $node_id , restarting node... Make sure node is healthy."
-      /etc/pgpool-II/node_restart $node_id
+      if [[ $node_id == 0 && ! -f $PGPOOL_TRIGGER_FAILOVER ]]; then
+        /usr/local/bin/mandrill $SYSADMIN_EMAIL "PgPool Node Status Alert:`hostname`" "`hostname`: Failed node: $node_id , restarting node... Make sure node is healthy."
+        /etc/pgpool-II/node_restart $node_id
+      fi
     fi
   done
 fi

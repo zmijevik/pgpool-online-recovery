@@ -63,12 +63,15 @@ Failback () {
     ssh -i $postgres_user_key postgres@$new_slave_name "cp -p $postgres_configdir/postgresql.conf.slave $postgres_configdir/postgresql.conf"
     echo "mv $postgres_datadir/recovery.done $postgres_datadir/recovery.conf"
     ssh -i $postgres_user_key postgres@$new_slave_name  "[ -f $postgres_datadir/recovery.done ] && mv $postgres_datadir/recovery.done $postgres_datadir/recovery.conf"
-    ssh -i $postgres_user_key postgres@$new_slave_name "[ -f /tmp/postgresql.trigger.failover ] && rm /tmp/postgresql.trigger.failover"
+    ssh -i $postgres_user_key postgres@$new_slave_name "[ -f $PGPOOL_TRIGGER_FAILOVER ] && rm $PGPOOL_TRIGGER_FAILOVER"
     # Switch slave to new master
     echo "[INFO] Setting up configuration for the new master '$new_master_name'..."
-    ssh -i $postgres_user_key postgres@$new_master_name "[ -f /tmp/postgresql.trigger.failover ] && rm /tmp/postgresql.trigger.failover"
+    ssh -i $postgres_user_key postgres@$new_master_name "[ -f $PGPOOL_TRIGGER_FAILOVER ] && rm $PGPOOL_TRIGGER_FAILOVER"
     ssh -i $postgres_user_key postgres@$new_master_name "[ -f $postgres_datadir/recovery.conf ] && mv $postgres_datadir/recovery.conf $postgres_datadir/recovery.done"
     ssh -i $postgres_user_key postgres@$new_master_name "cp -p $postgres_configdir/postgresql.conf.master $postgres_configdir/postgresql.conf"
+    echo "[INFO] Deleting trigger files from PGPool Server Pair"
+    ssh -i $postgres_user_key postgres@$PGPOOL_FAILOVER_HOST "[ -f $PGPOOL_TRIGGER_FAILOVER ] && rm -f $PGPOOL_TRIGGER_FAILOVER"
+    [ -f $PGPOOL_TRIGGER_FAILOVER ] && rm -f $PGPOOL_TRIGGER_FAILOVER
     echo "[INFO] Restarting new master..."
     ssh -t -t -i $postgres_user_key postgres@$new_master_name "sudo systemctl restart postgresql"
     status=$(ssh -i $postgres_user_key postgres@$new_master_name "if ! killall -0 postgres; then echo 'error'; else echo 'running'; fi;")
