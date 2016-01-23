@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+node_id=$1
+echo "Restarting node $node_id: "
+echo "    current status: $(pcp_node_info 10 localhost 9898 pgpool $PGPOOL_PASSWD $node_id | awk '{print $3}')"
+pcp_detach_node 10 localhost 9898 pgpool $PGPOOL_PASSWD $node_id
+pcp_attach_node 10 localhost 9898 pgpool $PGPOOL_PASSWD $node_id
+sleep 5
+echo "    resulting status: $(pcp_node_info 10 localhost 9898 pgpool $PGPOOL_PASSWD $node_id | awk '{print $3}')"

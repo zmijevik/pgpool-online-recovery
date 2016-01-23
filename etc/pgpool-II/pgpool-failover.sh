@@ -11,8 +11,6 @@ if [ $HAS_FLOATING_IP = "false" ]; then
     done
 fi
 
-/etc/pgpool-II/restartnode.sh 0
-/etc/pgpool-II/restartnode.sh 1
-/etc/pgpool-II/nodestatuses.sh
+/etc/pgpool-II/nodes_assurehealthy
 
 /usr/local/bin/mandrill $SYSADMIN_EMAIL "PgPool Failover Alert:`hostname`" "`hostname` is now the new pgpool server."

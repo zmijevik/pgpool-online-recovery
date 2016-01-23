@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+HAS_FLOATING_IP=$(curl -s http://169.254.169.254/metadata/v1/floating_ip/ipv4/active)
+
+if [ $HAS_FLOATING_IP = "true" ]; then
+  for (( node_id=0; node_id<$PGPOOL_NODE_COUNT ; node_id++ ))
+  do
+    node_info=$(pcp_node_info 10 localhost 9898 pgpool $PGPOOL_PASSWD $node_id)
+    node_name=$( echo $node_info | awk '{print $1}')
+    node_status=$( echo $node_info | awk '{print $3}')
+    if [[ $node_status != '1'  ]]; then
+      /usr/local/bin/mandrill $SYSADMIN_EMAIL "PgPool Node Status Alert:`hostname`" "`hostname`: Failed node: $node_id , restarting node... Make sure node is healthy."
+      /etc/pgpool-II/node_restart $node_id
+    fi
+  done
+fi

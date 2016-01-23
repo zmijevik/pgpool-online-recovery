@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+for (( node_id=0; node_id<$PGPOOL_NODE_COUNT ; node_id++ ))
+  do
+    node_info=$(pcp_node_info 10 localhost 9898 pgpool $PGPOOL_PASSWD $node_id)
+    node_name=$( echo $node_info | awk '{print $1}')
+    node_status=$( echo $node_info | awk '{print $3}')
+    echo "$node_name: $node_status"
+  done
