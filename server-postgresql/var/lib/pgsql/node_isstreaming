@@ -1,0 +1,14 @@
+#!/bin/bash
+node_role=$(/var/lib/pgsql/node_role)
+if [[ $node_role == 'master' ]]; then
+  is_streaming=$(ps -ef | grep streaming | grep -v grep | awk {'print $14 ": " $15 '})
+elif [[ $node_role == 'slave' ]]; then
+  is_streaming=$(ps -ef | grep streaming | grep -v grep | awk {'print $12 ": " $13 '})
+else
+  echo "Error retrieving node role: $node_role";
+  exit 0;
+fi
+case $is_streaming in
+  *streaming:\ 0* ) echo true;;
+  * ) echo false;;
+esac

@@ -1,0 +1,3 @@
+SLAVE_HOST='production-database-replica2'
+SYSADMIN_EMAIL='sysadmin@mail.com'
+MANDRILL_API_KEY='9835t8949ht4oigh40ih'
