@@ -1,19 +1,22 @@
+#!/bin/bash
 node_role=$(/var/lib/pgsql/node_role);
 is_streaming_command='/var/lib/pgsql/node_isstreaming';
 is_streaming=$($is_streaming_command);
 error=false
-if [[ ! $is_streaming ]]; then
-  error="Master node is not streaming: $is_streaming";
-elif [[ $node_role == 'master' ]]; then
-  slave_is_streaming=$(ssh -i /var/lib/pgsql/.ssh/id_rsa postgres@$SLAVE_HOST $is_streaming_command)
-  [[ !$slave_is_streaming ]]; error="Slave node is not streaming: $slave_is_streaming"
-elif [[ $node_role == 'slave' ]]; then
+if [[ $node_role == 'slave' ]]; then
   exit 0;#we only run this from the master node
+elif [[ $node_role == 'master' ]]; then
+  if [[ $is_streaming != 'true' ]]; then
+    error="Master node is not streaming: $is_streaming";
+  else
+    slave_is_streaming=$(ssh -i /var/lib/pgsql/.ssh/id_rsa postgres@$SLAVE_HOST $is_streaming_command)
+    [[ $slave_is_streaming != 'true' ]] && error="Slave node is not streaming: $slave_is_streaming"
+  fi
 else
   error="Unresolved error, Master Streaming Response: $is_streaming, Node Role Response: $node_role"
 fi
 
-if [[ $error ]]; then
-  "Mailing the following error: $error"
+if [[ $error != false ]]; then
+  echo "Mailing the following error: $error"
   /usr/local/bin/mandrill $SYSADMIN_EMAIL "PostgreSQL Health Alert:`hostname`" "`hostname` Error: $error"
 fi
