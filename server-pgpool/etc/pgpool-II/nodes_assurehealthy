@@ -1,7 +1,12 @@
 #!/usr/bin/env sh
 NODE_ISACTIVE=$(/etc/pgpool-II/node_isactive)
 
-if [ $NODE_ISACTIVE = "true" ]; then
+function restartAndMail {
+  /usr/local/bin/mandrill $SYSADMIN_EMAIL "PgPool Node Status Alert:`hostname`" "`hostname`: Failed node: $node_id , restarting node... Make sure node is healthy."
+  /etc/pgpool-II/node_restart $node_id
+}
+
+if [ $NODE_ISACTIVE == "true" ]; then
   for (( node_id=0; node_id<$PGPOOL_NODE_COUNT ; node_id++ ))
   do
     node_info=$(pcp_node_info 10 localhost 9898 pgpool $PGPOOL_PASSWD $node_id)
@@ -9,8 +14,9 @@ if [ $NODE_ISACTIVE = "true" ]; then
     node_status=$( echo $node_info | awk '{print $3}')
     if [[ $node_status != '2'  ]]; then
       if [[ $node_id == 0 && ! -f $PGPOOL_TRIGGER_FAILOVER ]]; then
-        /usr/local/bin/mandrill $SYSADMIN_EMAIL "PgPool Node Status Alert:`hostname`" "`hostname`: Failed node: $node_id , restarting node... Make sure node is healthy."
-        /etc/pgpool-II/node_restart $node_id
+        restartAndMail;
+      elif [[ $node_id == 1 ]]; then
+        restartAndMail;
       fi
     fi
   done
