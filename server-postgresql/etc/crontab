@@ -1,2 +1,2 @@
 ##This should not be in the hot standby
- *  *  *  *  * root    /var/lib/pgsql/nodes_assurehealthy > 2>&1
+ *  *  *  *  * root $SHELL /var/lib/pgsql/nodes_assurehealthy > 2>&1

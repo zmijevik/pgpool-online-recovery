@@ -1,1 +1,3 @@
-  *  *  *  *  * root    /etc/pgpool-II/nodes_assurehealthy > 2>&1
+  *  *  *  *  * root $SHELL /etc/pgpool-II/nodes_assurehealthy > /etc/pgpool-II/cron.log
+##Keep the node fresh if its in hot stanby mode
+ 00 00  *  *  * root  [[ `$SHELL /etc/pgpool-II/node_isactive` == 'false' ]] && /usr/sbin/service pgpool restart > ~/cron.log
