@@ -9,6 +9,9 @@ PGPOOL_FAILOVER_HOST=$5
   if [ $failed_node != $old_primary ]; then
     echo "[INFO] Slave node ($failed_node) is down. Failover not triggered !";
     exit 0;
+  elif [ $failed_node != 0 ]; then 
+    echo "[INFO] non-primary node ($failed_node) is down. Failover not triggered !";
+    exit 0
   fi
   echo "Failed node: $failed_node , New Master: $new_master"
   set -x

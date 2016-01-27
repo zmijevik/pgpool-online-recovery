@@ -1,0 +1,10 @@
+#!/bin/bash
+
+is_in_recovery=$(psql -c "select pg_is_in_recovery()" | tail -n 3 | head -n 1 | awk {'print $1'})
+if [[ $is_in_recovery == "t" ]]; then
+    echo "slave"
+elif [[ $is_in_recovery == "f" ]]; then
+    echo "master";
+else
+    echo "error: $is_in_recovery";
+fi

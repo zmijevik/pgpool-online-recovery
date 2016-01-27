@@ -1,7 +1,8 @@
 ID=$(curl -s http://169.254.169.254/metadata/v1/id)
-HAS_FLOATING_IP=$(curl -s http://169.254.169.254/metadata/v1/floating_ip/ipv4/active)
 
-if [ $HAS_FLOATING_IP = "false" ]; then
+NODE_ISACTIVE=$(/etc/pgpool-II/node_isactive)
+
+if [ $NODE_ISACTIVE = "false" ]; then
     n=0
     while [ $n -lt 10 ]
     do
