@@ -18,6 +18,10 @@ if [ $NODE_ISACTIVE == "true" ]; then
       elif [[ $node_id == 1 ]]; then
         restartAndMail;
       fi
+    #Master is node attached during a failover.
+    elif [[ $node_status == '2' && $node_id == 0 && -f $PGPOOL_TRIGGER_FAILOVER ]]; then
+      /etc/pgpool-II/node_detach $node_id
+      /usr/local/bin/mandrill $SYSADMIN_EMAIL "PgPool Node Status Alert:`hostname`" "`hostname`: Master node: $node_id , was connected while in failover state, assure the node is detached and there was no data written."
     fi
   done
 fi
