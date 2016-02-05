@@ -15,5 +15,4 @@ MAILTO=root
   *  *  *  *  * root $SHELL /etc/pgpool-II/nodes_assurehealthy >> /etc/pgpool-II/logs/cron.log
   *  *  *  *  * root $SHELL /etc/pgpool-II/watchdog_assurehealthy >> /etc/pgpool-II/logs/cron.log
 ##Keep the node fresh if its in hot stanby mode
-  00 00  *  *  * root  [[ `$SHELL /etc/pgpool-II/node_isactive` == 'false' ]] && /usr/sbin/service pgpool restart && /usr/bin/echo "Performing daily restart on inactive node" >> /etc/pgpool-II/cron.log
-  gs
+  00 00  *  *  * root  [[ `$SHELL /etc/pgpool-II/node_isactive` == 'false' ]] && /usr/sbin/service pgpool restart && /usr/bin/echo "Performing daily restart on inactive node" >> /etc/pgpool-II/logs/cron.log
