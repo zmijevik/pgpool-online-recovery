@@ -8,10 +8,11 @@ lastdate=$(stat -c \%Y /var/log/pgpool/pgpool.log)
 log_inactivity=`expr $(date +%s) - ${lastdate}`
 
 is_active=$(/etc/pgpool-II/node_isactive)
-nodes_status=$(/etc/pgpool-II/nodes_status)
+nodes_status=$(timeout 10 /etc/pgpool-II/nodes_status || echo "ConnectionError")
 
 if [[ $is_active != "false" && $log_inactivity -gt 60 ]]; then
   echo "Seconds since last log: $log_inactivity"
+  echo "`date` Restarting due to 60 seconds of log inactivity"
   restart
 elif [[ $is_active == "false" && $nodes_status == *ConnectionError* ]]; then
   restart
