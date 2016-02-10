@@ -1,11 +1,5 @@
 #!/usr/bin/env sh
-lastdate=$(stat -c \%Y /var/log/pgpool/pgpool.log)
-
-log_inactivity=`expr $(date +%s) - ${lastdate}`
-
-echo "Seconds since last log: $log_inactivity"
-
-if [[ $log_inactivity -gt 60 ]]; then
+function restart {
     echo "Removing pid files"
     rm -f /var/run/pgpool/*
     rm -f /var/run/postgresql/.*
@@ -15,4 +9,19 @@ if [[ $log_inactivity -gt 60 ]]; then
     echo "Restarting pgpool"
     service pgpool restart
     echo "`date` Restarting due to 60 seconds of log inactivity"
+}
+
+lastdate=$(stat -c \%Y /var/log/pgpool/pgpool.log)
+
+log_inactivity=`expr $(date +%s) - ${lastdate}`
+
+echo "Seconds since last log: $log_inactivity"
+
+is_active=$(/etc/pgpool-II/node_isactive)
+nodes_status=$(/etc/pgpool-II/nodes_status)
+
+if [[ $is_active != "false" && $log_inactivity -gt 60 ]]; then
+  restart
+elif [[ $is_active == "false" && $nodes_status == *ConnectionError* ]]; then
+  restart
 fi
