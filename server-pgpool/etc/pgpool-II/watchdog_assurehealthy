@@ -1,26 +1,17 @@
 #!/usr/bin/env sh
 function restart {
-    echo "Removing pid files"
-    rm -f /var/run/pgpool/*
-    rm -f /var/run/postgresql/.*
-    echo "Killing processes using port 5432 and 9898"
-    fuser -k 5432/tcp
-    fuser -k 9898/tcp
-    echo "Restarting pgpool"
-    service pgpool restart
-    echo "`date` Restarting due to 60 seconds of log inactivity"
+  /etc/pgpool-II/pgpool_restart
 }
 
 lastdate=$(stat -c \%Y /var/log/pgpool/pgpool.log)
 
 log_inactivity=`expr $(date +%s) - ${lastdate}`
 
-echo "Seconds since last log: $log_inactivity"
-
 is_active=$(/etc/pgpool-II/node_isactive)
 nodes_status=$(/etc/pgpool-II/nodes_status)
 
 if [[ $is_active != "false" && $log_inactivity -gt 60 ]]; then
+  echo "Seconds since last log: $log_inactivity"
   restart
 elif [[ $is_active == "false" && $nodes_status == *ConnectionError* ]]; then
   restart

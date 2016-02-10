@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+echo "Removing pid files"
+rm -f /var/run/pgpool/*
+rm -f /var/run/postgresql/.*
+echo "Killing processes using port 5432 and 9898"
+fuser -k 5432/tcp
+fuser -k 9898/tcp
+echo "Restarting pgpool"
+service pgpool restart
+echo "`date` Restarting due to 60 seconds of log inactivity"
