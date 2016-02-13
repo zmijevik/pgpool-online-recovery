@@ -16,3 +16,4 @@ MAILTO=root
   *  *  *  *  * root $SHELL /etc/pgpool-II/watchdog_assurehealthy >> /etc/pgpool-II/logs/cron.log
 ##Keep the node fresh if its in hot stanby mode
   00 00  *  *  * root  [[ `$SHELL /etc/pgpool-II/node_isactive` == 'false' ]] && $SHELL /etc/pgpool-II/pgpool_restart && /usr/bin/echo "Performing daily restart on inactive node" >> /etc/pgpool-II/logs/cron.log
+  00 *  *  *  * root $SHELL /root/jobs/ping_clients >> /root/jobs/cron.log
